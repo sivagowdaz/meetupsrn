@@ -1,75 +1,45 @@
+import { Fragment } from "react/cjs/react.production.min"
 import { MongoClient, ObjectId } from 'mongodb';
-import { Fragment } from 'react';
-import Head from 'next/head';
 
-import MeetupDetail from '../../components/meetups/MeetupDetail';
-
-function MeetupDetails(props) {
-  return (
-    <Fragment>
-      <Head>
-        <title>{props.meetupData.title}</title>
-        <meta name='description' content={props.meetupData.description} />
-      </Head>
-      <MeetupDetail
-        image={props.meetupData.image}
-        title={props.meetupData.title}
-        address={props.meetupData.address}
-        description={props.meetupData.description}
-      />
-    </Fragment>
-  );
+const MeetupDetail = (props) => {
+  console.log(props.meetup)
+  return <Fragment>
+    <img src={props.meetup.image} width='400px' height='400px'></img>
+    <p>{props.meetup.title}</p>
+    <p>{props.meetup.address}</p>
+    <p>{props.meetup.description}</p>
+  </Fragment>
 }
-
 export async function getStaticPaths() {
-  const client = await MongoClient.connect(
-    'mongodb+srv://maximilian:TU6WdZF2EjFWsqUt@cluster0.ntrwp.mongodb.net/meetups?retryWrites=true&w=majority'
-  );
+  const client = await MongoClient.connect('mongodb+srv://shivaprasad:asdfghj123@taskmanager.wzqqo.mongodb.net/Meetups?retryWrites=true&w=majority')
   const db = client.db();
-
-  const meetupsCollection = db.collection('meetups');
-
-  const meetups = await meetupsCollection.find({}, { _id: 1 }).toArray();
-
+  const meetupCollection = db.collection('meetups')
+  const meetups = await meetupCollection.find({}, { _id: 1 }).toArray();
   client.close();
 
   return {
-    fallback: 'blocking',
-    paths: meetups.map((meetup) => ({
-      params: { meetupId: meetup._id.toString() },
-    })),
-  };
+    fallback: false,
+    paths: meetups.map((meetup) => ({params:{meetupId:meetup._id.toString()}})),
+  }
 }
 
 export async function getStaticProps(context) {
-  // fetch data for a single meetup
+  const { meetupId } = context.params
 
-  const meetupId = context.params.meetupId;
-
-  const client = await MongoClient.connect(
-    'mongodb+srv://maximilian:TU6WdZF2EjFWsqUt@cluster0.ntrwp.mongodb.net/meetups?retryWrites=true&w=majority'
-  );
+  const client = await MongoClient.connect('mongodb+srv://shivaprasad:asdfghj123@taskmanager.wzqqo.mongodb.net/Meetups?retryWrites=true&w=majority')
   const db = client.db();
+  const meetupCollection = db.collection('meetups')
 
-  const meetupsCollection = db.collection('meetups');
-
-  const selectedMeetup = await meetupsCollection.findOne({
-    _id: ObjectId(meetupId),
-  });
-
-  client.close();
-
+  const meetup = await meetupCollection.findOne({ _id: ObjectId(meetupId) });
+  console.log("meetup id",meetupId)
+  console.log("the fetched data is", meetup)
+  var newmeetup = { ...meetup, _id: meetup._id.toString() }
+  console.log("djf",newmeetup)
   return {
     props: {
-      meetupData: {
-        id: selectedMeetup._id.toString(),
-        title: selectedMeetup.title,
-        address: selectedMeetup.address,
-        image: selectedMeetup.image,
-        description: selectedMeetup.description,
-      },
-    },
-  };
+      meetup: newmeetup
+    }
+  }
 }
 
-export default MeetupDetails;
+export default MeetupDetail;

@@ -1,5 +1,7 @@
 import { useRouter } from 'next/router';
 
+import Link from 'next/link';
+
 import Card from '../ui/Card';
 import classes from './MeetupItem.module.css';
 

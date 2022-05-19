@@ -1,61 +1,48 @@
-import { Fragment } from 'react';
-import Head from 'next/head';
+import MeetupList from '../components/meetups/MeetupList'
 import { MongoClient } from 'mongodb';
+import Head from 'next/head'
+import { Fragment } from 'react/cjs/react.production.min';
 
-import MeetupList from '../components/meetups/MeetupList';
-
-function HomePage(props) {
+const HomePage = (props) => {
   return (
     <Fragment>
       <Head>
-        <title>React Meetups</title>
-        <meta
-          name='description'
-          content='Browse a huge list of highly active React meetups!'
-        />
+        <title>meetup home</title>
+        <meta name='description' content='this is the amazing meetup website created using next js'/>
       </Head>
-      <MeetupList meetups={props.meetups} />;
+      <MeetupList meetups={ props.meetups }/>
     </Fragment>
-  );
+  )
 }
 
-// export async function getServerSideProps(context) {
-//   const req = context.req;
-//   const res = context.res;
-
-//   // fetch data from an API
-
-//   return {
-//     props: {
-//       meetups: DUMMY_MEETUPS
-//     }
-//   };
-// }
-
 export async function getStaticProps() {
-  // fetch data from an API
-  const client = await MongoClient.connect(
-    'mongodb+srv://maximilian:TU6WdZF2EjFWsqUt@cluster0.ntrwp.mongodb.net/meetups?retryWrites=true&w=majority'
-  );
+  const client = await MongoClient.connect('mongodb+srv://shivaprasad:asdfghj123@taskmanager.wzqqo.mongodb.net/Meetups?retryWrites=true&w=majority')
   const db = client.db();
-
-  const meetupsCollection = db.collection('meetups');
-
-  const meetups = await meetupsCollection.find().toArray();
-
+  const meetupCollection = db.collection('meetups')
+  const meetups = await meetupCollection.find().toArray();
+  console.log("the meetups are", meetups)
   client.close();
-
-  return {
+  return ({
     props: {
       meetups: meetups.map((meetup) => ({
         title: meetup.title,
-        address: meetup.address,
         image: meetup.image,
-        id: meetup._id.toString(),
-      })),
+        address: meetup.address,
+        description: meetup.description,
+        id: meetup._id.toString()
+      }))
     },
-    revalidate: 1,
-  };
+    revalidate: 1000
+  });
 }
+// export async function getServerSideProps(context) {
+//   const res = context.res;
+//   const req = context.req
+//   return {
+//     props: {
+//       meetups: DUMMY_DATA
+//     }
+//   }
+// }
 
 export default HomePage;
