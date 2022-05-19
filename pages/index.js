@@ -32,7 +32,7 @@ export async function getStaticProps() {
         id: meetup._id.toString()
       }))
     },
-    revalidate: 1000
+    revalidate: 10
   });
 }
 // export async function getServerSideProps(context) {

@@ -2,7 +2,6 @@ import { Fragment } from "react/cjs/react.production.min"
 import { MongoClient, ObjectId } from 'mongodb';
 
 const MeetupDetail = (props) => {
-  console.log(props.meetup)
   return <Fragment>
     <img src={props.meetup.image} width='400px' height='400px'></img>
     <p>{props.meetup.title}</p>
@@ -18,7 +17,7 @@ export async function getStaticPaths() {
   client.close();
 
   return {
-    fallback: false,
+    fallback: "blocking",
     paths: meetups.map((meetup) => ({params:{meetupId:meetup._id.toString()}})),
   }
 }
@@ -34,7 +33,6 @@ export async function getStaticProps(context) {
   console.log("meetup id",meetupId)
   console.log("the fetched data is", meetup)
   var newmeetup = { ...meetup, _id: meetup._id.toString() }
-  console.log("djf",newmeetup)
   return {
     props: {
       meetup: newmeetup
